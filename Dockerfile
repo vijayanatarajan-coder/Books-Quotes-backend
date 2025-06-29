@@ -5,15 +5,23 @@ WORKDIR /app
 # Use the .NET SDK image to build the app
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
-COPY . .
-RUN dotnet publish -c Release -o /app
+
+# Copy only the csproj and restore dependencies
+COPY BackendApi.csproj ./
+RUN dotnet restore ./BackendApi.csproj
+
+# Now copy everything else
+COPY . ./
+
+# Build and publish the specific project
+RUN dotnet publish ./BackendApi.csproj -c Release -o /app
 
 # Final stage/image
 FROM base AS final
 WORKDIR /app
 COPY --from=build /app .
 
-# Expose port 3000 for the application
+# Expose port 3000
 EXPOSE 3000
 
 ENTRYPOINT ["dotnet", "BackendApi.dll"]
