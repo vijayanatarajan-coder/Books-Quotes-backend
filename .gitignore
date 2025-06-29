@@ -8,8 +8,14 @@ obj/
 *.userosscache
 *.sln.docstates
 
-# Visual Studio Code settings
+# Visual Studio Code
 .vscode/
+
+# Rider
+.idea/
+
+# Resharper
+*.DotSettings.user
 
 # ASP.NET temporary files
 **/App_Data/
@@ -26,13 +32,7 @@ obj/
 publish/
 out/
 
-# Rider
-.idea/
-
-# Resharper
-*.DotSettings.user
-
-# .NET Core
+# .NET Core artifacts
 project.lock.json
 project.fragment.lock.json
 artifacts/
@@ -40,12 +40,11 @@ artifacts/
 # Auto-generated files
 Generated_Code/
 
-# Npm packages (if you have frontend)
+# Npm packages
 node_modules/
 
 # Environment files
 .env
 
-# EF Core Migrations (if you don't want snapshots)
-# (comment this out if you DO want to keep migration snapshots)
+# EF Core Migrations (uncomment if you don't want snapshots)
 # Migrations/*Snapshot.cs
