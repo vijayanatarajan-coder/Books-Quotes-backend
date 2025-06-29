@@ -13,8 +13,7 @@ FROM base AS final
 WORKDIR /app
 COPY --from=build /app .
 
-# Expose port 8080
-ENV ASPNETCORE_URLS=http://+:8080
-EXPOSE 8080
+# Expose port 3000 for the application
+EXPOSE 3000
 
 ENTRYPOINT ["dotnet", "BackendApi.dll"]
