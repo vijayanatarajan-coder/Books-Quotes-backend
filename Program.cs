@@ -1,20 +1,19 @@
 using Microsoft.EntityFrameworkCore;
 using BackendApi.Data;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add DbContext and configure SQLite (replace connection string with yours if needed)
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite("Data Source=books.db"));
 
-// Add controllers (if you have API controllers)
 builder.Services.AddControllers();
 
-// Add Swagger for API documentation
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Add CORS policy (replace with your actual policy)
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
@@ -23,12 +22,28 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Add authentication services here if any (optional)
+// 🟢 ADD THIS: Configure Authentication with JWT Bearer
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = "yourapp",
+            ValidAudience = "yourapp_users",
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes("9dH@8wXv3Lp2R#ZtBnQ5sMfE!kG4YjVu"))
+        };
+    });
 
-// Build the app
+// 🟢 ADD THIS: Authorization services
+builder.Services.AddAuthorization();
+
 var app = builder.Build();
 
-// Automatically create the SQLite DB file and tables if they don't exist
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -44,7 +59,8 @@ if (app.Environment.IsDevelopment())
 app.UseCors("AllowFrontend");
 app.UseHttpsRedirection();
 
-app.UseAuthentication();  
+// 🟢 Ensure Authentication comes before Authorization
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
