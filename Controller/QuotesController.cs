@@ -17,7 +17,7 @@ namespace BackendApi.Controllers
             _context = context;
         }
 
-        
+
         [HttpGet]
         public async Task<IActionResult> GetQuotes()
         {
@@ -25,7 +25,7 @@ namespace BackendApi.Controllers
             return Ok(quotes);
         }
 
-       
+
         [HttpGet("{id}")]
         [Authorize]
         public async Task<IActionResult> GetQuote(int id)
@@ -38,7 +38,7 @@ namespace BackendApi.Controllers
             return Ok(quote);
         }
 
-       
+
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> AddQuote([FromBody] Quote newQuote)
@@ -48,5 +48,48 @@ namespace BackendApi.Controllers
 
             return CreatedAtAction(nameof(GetQuote), new { id = newQuote.Id }, newQuote);
         }
+        
+        [HttpPut("{id}")]
+        [Authorize]
+        public async Task<IActionResult> UpdateQuote(int id, [FromBody] Quote updatedQuote)
+        {
+            if (id != updatedQuote.Id)
+            {
+                return BadRequest("ID in URL does not match ID in body.");
+            }
+
+            var existingQuote = await _context.Quotes.FindAsync(id);
+            if (existingQuote == null)
+            {
+                return NotFound();
+            }
+
+           
+            existingQuote.Author = updatedQuote.Author;
+            existingQuote.Text = updatedQuote.Text;
+          
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        [Authorize]
+        public async Task<IActionResult> DeleteQuote(int id)
+        {
+            var quote = await _context.Quotes.FindAsync(id);
+            if (quote == null)
+            {
+                return NotFound();
+            }
+
+            _context.Quotes.Remove(quote);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
     }
 }
+    
+
