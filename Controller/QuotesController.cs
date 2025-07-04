@@ -53,21 +53,14 @@ namespace BackendApi.Controllers
         [Authorize]
         public async Task<IActionResult> UpdateQuote(int id, [FromBody] Quote updatedQuote)
         {
-            if (id != updatedQuote.Id)
-            {
-                return BadRequest("ID in URL does not match ID in body.");
-            }
-
             var existingQuote = await _context.Quotes.FindAsync(id);
             if (existingQuote == null)
             {
                 return NotFound();
             }
 
-           
             existingQuote.Author = updatedQuote.Author;
             existingQuote.Text = updatedQuote.Text;
-          
 
             await _context.SaveChangesAsync();
 
